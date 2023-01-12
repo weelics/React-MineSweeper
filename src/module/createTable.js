@@ -20,8 +20,9 @@ export default function createTable(length , nMine) {
         isVisible: false,
         value: 0,
         isBomb: false,
+        isFlagged: false,
       };
-      if(i >= 0 && i <= nMine) tmpA[i].isBomb = true;
+      if(i >= 0 && i < nMine) tmpA[i].isBomb = true;
   }
   shuffleArray(tmpA);
   const a = new Array(length);

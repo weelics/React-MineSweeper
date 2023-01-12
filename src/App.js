@@ -1,11 +1,14 @@
 //import { useState } from "react";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Block from "./components/block";
 import createTable from "./module/createTable";
 
 const length = 9;
 const nMine = 10;
+let mineInGame = nMine;
+let winnerMine = 0;
+let cssFinishGame = "";
 
 const initBoard = () => createTable(length, nMine);
 
@@ -13,25 +16,41 @@ const initBoard = () => createTable(length, nMine);
 function App() {
 
   const [board, setBoard] = useState(initBoard);
-  //const [alert, setAlert] = useState("Avvisi qui!");
+  const [alert, setAlert] = useState("");
   const [show, setShow] = useState(false);
   const [points, setPoints] = useState(0);
-  // const [inClicks,setInClicks] = useState(true);
-  const setVisible = ((row,col) => {
+  const [inClicks,setInClicks] = useState(true);
+
+  const reset = () => {
+    setShow(false);
+    setPoints(0);
+    mineInGame = nMine;
+    winnerMine = 0;
+    setBoard(initBoard);
+  }
+
+  const setVisible = useCallback((row,col) => {
     board[row][col].isVisible = true;
-  });
+  },[board]);
 
   function addPoints() {
     setPoints((old) => old + 1);
    }
   function gameOver() {
+    setAlert("HAI PERSO!");
+    cssFinishGame = "bg-red-600";
     setPoints(0);
     setShow(true);
   }
 
+  const gameWin = () => {
+    setAlert("HAI VINTO!");
+    cssFinishGame = "bg-green-600";
+    setPoints(0);
+    setShow(true);
+  }
 
-
-  const check = ((row, col) => {
+  const check = useCallback ((row, col) => {
     if (row < 0 || row >= length || col < 0 || col >= length) return;
     if (board[row][col].isBomb) return;
     if (board[row][col].value === 0 && board[row][col].isVisible === false) {
@@ -48,22 +67,41 @@ function App() {
       board[row][col].isVisible = true;
     }
 
-  });
+  },[board]);
 
-  const checkBoard = ((key) =>{
+  const checkBoard = useCallback((key) =>{
+
     const row = Math.floor(key / length);
     const col = (key % length);
+    if(!inClicks) {
+      if(mineInGame === 0 && !board[row][col].isFlagged) return;
+      board[row][col].isFlagged = !board[row][col].isFlagged;
+      setBoard([...board]);
+      if(board[row][col].isFlagged) {
+        if(board[row][col].isBomb) winnerMine++;
+        mineInGame--;
+      }
+      else {
+        if(board[row][col].isBomb) winnerMine--;
+        mineInGame++;
+      }
+
+      if(winnerMine === nMine) gameWin();
+
+      console.log("mineInGame: " + mineInGame + " winnerMine: " + winnerMine);
+      return;
+    }
     if(board[row][col].isBomb) gameOver();
     check(row,col);
     setVisible(row,col);
-    setBoard(board);
+    setBoard([...board]);
     addPoints();
-  });
+  },[board, check, inClicks, setVisible]);
 
   return (
     <div className="mx-auto relative bg-[#C0C0C0] gap-4 md:max-w-min flex flex-col">
       {show && (
-        <div className="absolute bg-red-700 opacity-50 top-[135px] w-full h-[59%]"></div>
+        <div className={`absolute ${cssFinishGame} opacity-60 top-[135px] w-full h-[393px] flex justify-center items-center`}><p className="text-8xl font-extrabold text-cyan-500 text-center">{alert}</p></div>
       )}
       <div
         className="bg-[#9f9f9f]  p-2 border-t-4 border-l-4 
@@ -77,9 +115,7 @@ function App() {
           </p>
           <svg
             onClick={() => {
-              setShow(false);
-              setPoints(0);
-              setBoard(initBoard);
+              reset();
             }}
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -132,17 +168,17 @@ function App() {
         border-t-gray-300 border-l-gray-300
         border-b-gray-600 border-r-gray-600"
       >
-        <div className="flex justify-around items-center p-5">
+        <div className="flex justify-around items-center ">
 
           <svg 
-          //onClick={() => setInClicks(true)} 
-          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={"border-green-600 w-14 h-14 border-4 rounded-full  bg-gray-800 fill-red-600 hover:fill-amber-500"}>
+          onClick={() => setInClicks(true)} 
+          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`${inClicks ? 'border-green-600' : 'border-gray-500'} w-20 h-20 border-8 rounded-full  bg-gray-800 fill-red-600 hover:fill-amber-500`}>
             <path fillRule="evenodd" d="M12 1.5a.75.75 0 01.75.75V4.5a.75.75 0 01-1.5 0V2.25A.75.75 0 0112 1.5zM5.636 4.136a.75.75 0 011.06 0l1.592 1.591a.75.75 0 01-1.061 1.06l-1.591-1.59a.75.75 0 010-1.061zm12.728 0a.75.75 0 010 1.06l-1.591 1.592a.75.75 0 01-1.06-1.061l1.59-1.591a.75.75 0 011.061 0zm-6.816 4.496a.75.75 0 01.82.311l5.228 7.917a.75.75 0 01-.777 1.148l-2.097-.43 1.045 3.9a.75.75 0 01-1.45.388l-1.044-3.899-1.601 1.42a.75.75 0 01-1.247-.606l.569-9.47a.75.75 0 01.554-.68zM3 10.5a.75.75 0 01.75-.75H6a.75.75 0 010 1.5H3.75A.75.75 0 013 10.5zm14.25 0a.75.75 0 01.75-.75h2.25a.75.75 0 010 1.5H18a.75.75 0 01-.75-.75zm-8.962 3.712a.75.75 0 010 1.061l-1.591 1.591a.75.75 0 11-1.061-1.06l1.591-1.592a.75.75 0 011.06 0z" clipRule="evenodd" />
           </svg>
 
           <svg 
-          //onClick={() => setInClicks(false)} 
-          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red" className="border-gray-500 w-14 h-14 border-4 rounded-full bg-gray-800 fill-red-600 hover:fill-amber-500">
+          onClick={() => setInClicks(false)} 
+          xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="red" className={`${inClicks ? 'border-gray-500' : 'border-green-600'} w-20 h-20 border-8 rounded-full bg-gray-800 fill-red-600 hover:fill-amber-500`}>
             <path fillRule="evenodd" d="M3 2.25a.75.75 0 01.75.75v.54l1.838-.46a9.75 9.75 0 016.725.738l.108.054a8.25 8.25 0 005.58.652l3.109-.732a.75.75 0 01.917.81 47.784 47.784 0 00.005 10.337.75.75 0 01-.574.812l-3.114.733a9.75 9.75 0 01-6.594-.77l-.108-.054a8.25 8.25 0 00-5.69-.625l-2.202.55V21a.75.75 0 01-1.5 0V3A.75.75 0 013 2.25z" clipRule="evenodd" />
           </svg>
 
