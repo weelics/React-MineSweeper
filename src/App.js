@@ -1,5 +1,3 @@
-//import { useState } from "react";
-
 import { useCallback, useState } from "react";
 import Block from "./components/block";
 import createTable from "./module/createTable";
@@ -18,14 +16,14 @@ function App() {
   const [board, setBoard] = useState(initBoard);
   const [alert, setAlert] = useState("");
   const [show, setShow] = useState(false);
-  const [points, setPoints] = useState(0);
+  const [points, setPoints] = useState(nMine);
   const [inClicks,setInClicks] = useState(true);
 
   const reset = () => {
     setShow(false);
-    setPoints(0);
     mineInGame = nMine;
     winnerMine = 0;
+    setPoints(mineInGame);
     setBoard(initBoard);
   }
 
@@ -33,20 +31,17 @@ function App() {
     board[row][col].isVisible = true;
   },[board]);
 
-  function addPoints() {
-    setPoints((old) => old + 1);
-   }
   function gameOver() {
     setAlert("HAI PERSO!");
     cssFinishGame = "bg-red-600";
-    setPoints(0);
+    setPoints(nMine);
     setShow(true);
   }
 
   const gameWin = () => {
     setAlert("HAI VINTO!");
     cssFinishGame = "bg-green-600";
-    setPoints(0);
+    setPoints(nMine);
     setShow(true);
   }
 
@@ -77,31 +72,31 @@ function App() {
       if(mineInGame === 0 && !board[row][col].isFlagged) return;
       board[row][col].isFlagged = !board[row][col].isFlagged;
       setBoard([...board]);
-      if(board[row][col].isFlagged) {
+      if(board[row][col].isFlagged && !board[row][col].isVisible) {
         if(board[row][col].isBomb) winnerMine++;
         mineInGame--;
       }
-      else {
+      else if(!board[row][col].isFlagged && !board[row][col].isVisible) {
         if(board[row][col].isBomb) winnerMine--;
         mineInGame++;
       }
-
+      setPoints(mineInGame);
       if(winnerMine === nMine) gameWin();
 
       console.log("mineInGame: " + mineInGame + " winnerMine: " + winnerMine);
       return;
     }
+    if(board[row][col].isFlagged) return;
     if(board[row][col].isBomb) gameOver();
     check(row,col);
     setVisible(row,col);
     setBoard([...board]);
-    addPoints();
   },[board, check, inClicks, setVisible]);
 
   return (
     <div className="mx-auto relative bg-[#C0C0C0] gap-4 md:max-w-min flex flex-col">
       {show && (
-        <div className={`absolute ${cssFinishGame} opacity-60 top-[135px] w-full h-[393px] flex justify-center items-center`}><p className="text-8xl font-extrabold text-cyan-500 text-center">{alert}</p></div>
+        <div className={`absolute ${cssFinishGame} opacity-60 top-[135px] w-full h-[357px] md:h-[394px] flex justify-center items-center`}><p className="text-8xl font-extrabold text-cyan-500 text-center">{alert}</p></div>
       )}
       <div
         className="bg-[#9f9f9f]  p-2 border-t-4 border-l-4 
@@ -111,7 +106,7 @@ function App() {
       >
         <div className="flex justify-between p-5 items-center">
           <p className="text-4xl text-red-500 bg-gray-800 w-[33%] h-10 text-center">
-            {nMine}
+            {"23:12"}
           </p>
           <svg
             onClick={() => {
