@@ -5,7 +5,7 @@ import Block from "./components/block";
 import createTable from "./module/createTable";
 
 const length = 9;
-const nMine = 11;
+const nMine = 10;
 
 const initBoard = () => createTable(length, nMine);
 
@@ -17,23 +17,21 @@ function App() {
   const [show, setShow] = useState(false);
   const [points, setPoints] = useState(0);
   // const [inClicks,setInClicks] = useState(true);
+  const setVisible = ((row,col) => {
+    board[row][col].isVisible = true;
+  });
 
   function addPoints() {
     setPoints((old) => old + 1);
    }
   function gameOver() {
-    //setPoints(0);
+    setPoints(0);
     setShow(true);
   }
 
-  const setVisible = (key) => {
-    const row = Math.floor(key / length);
-    const col = (key % length);
-    board[row][col].isVisible = true;
-    setBoard(board);
-  };
 
-  function check(row, col) {
+
+  const check = ((row, col) => {
     if (row < 0 || row >= length || col < 0 || col >= length) return;
     if (board[row][col].isBomb) return;
     if (board[row][col].value === 0 && board[row][col].isVisible === false) {
@@ -46,17 +44,21 @@ function App() {
       check(row, col + 1);
       check(row - 1, col + 1);
       check(row + 1, col - 1);
+    } else if(board[row][col].value !== 0){
+      board[row][col].isVisible = true;
     }
 
-  }
+  });
 
-  function checkBoard(key){
-    console.log("porco dio");
+  const checkBoard = ((key) =>{
     const row = Math.floor(key / length);
     const col = (key % length);
+    if(board[row][col].isBomb) gameOver();
     check(row,col);
+    setVisible(row,col);
     setBoard(board);
-  }
+    addPoints();
+  });
 
   return (
     <div className="mx-auto relative bg-[#C0C0C0] gap-4 md:max-w-min flex flex-col">
@@ -71,7 +73,7 @@ function App() {
       >
         <div className="flex justify-between p-5 items-center">
           <p className="text-4xl text-red-500 bg-gray-800 w-[33%] h-10 text-center">
-            00:00
+            {nMine}
           </p>
           <svg
             onClick={() => {
@@ -92,7 +94,7 @@ function App() {
           </svg>
 
           <p className="text-4xl text-red-500 bg-gray-800 w-[33%] h-10 text-center">
-            {points}
+           {points}
           </p>
         </div>
       </div>
@@ -116,9 +118,6 @@ function App() {
                     <Block
                     content={row}
                     checkBoard={() => checkBoard(row.key)}
-                    setVisible={() => setVisible(row.key)}
-                    gameOver={() => gameOver()}
-                    addPoints={() => addPoints()}
                     />
                   );
                 })}
