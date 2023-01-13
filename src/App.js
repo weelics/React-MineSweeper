@@ -75,7 +75,8 @@ function App() {
         check(row, col + 1);
         check(row - 1, col + 1);
         check(row + 1, col - 1);
-      } else if (board[row][col].value !== 0) {
+      } else if (board[row][col].value !== 0 &&
+        board[row][col].isFlagged === false) {
         board[row][col].isVisible = true;
       }
     },
