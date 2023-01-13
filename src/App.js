@@ -5,7 +5,6 @@ import createTable from "./module/createTable";
 const nCOL = 9;
 const length = 11;
 const nMine = 10;
-let winnerMine = 0;
 let cssFinishGame = "";
 
 function App() {
@@ -27,11 +26,19 @@ function App() {
   const reset = () => {
     setOver(false);
     setTimer(0);
-    winnerMine = 0;
     setShow(false);
     setMine(nMine);
     setBoard(createTable(nCOL, length, nMine));
   };
+
+  const verify = useCallback(() => {
+    let cont = 0;
+    board.forEach((element) => {
+      cont += element.filter((item) => item.isVisible === true).length;
+    });
+    if (cont >= nCOL * length - nMine) return true;
+    else return false;
+  }, [board]);
 
   const setVisible = useCallback(
     (row, col) => {
@@ -98,14 +105,10 @@ function App() {
         setBoard([...board]);
 
         if (board[row][col].isFlagged && !board[row][col].isVisible) {
-          if (board[row][col].isBomb) winnerMine++;
           setMine((old) => old - 1);
         } else if (!board[row][col].isFlagged && !board[row][col].isVisible) {
-          if (board[row][col].isBomb) winnerMine--;
           setMine((old) => old + 1);
         }
-
-        if (winnerMine === nMine) gameWin();
         return;
       }
 
@@ -116,8 +119,9 @@ function App() {
       check(row, col);
       setVisible(row, col);
       setBoard([...board]);
+      if (verify()) gameWin();
     },
-    [board, check, gameOver, gameWin, inClicks, mine, setVisible]
+    [board, check, gameOver, gameWin, inClicks, mine, setVisible, verify]
   );
 
   return (
