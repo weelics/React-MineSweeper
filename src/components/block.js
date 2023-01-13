@@ -5,7 +5,8 @@ function Block(props) {
   //if (props.content.isBomb) css += " bg-red-100";
   let body = "";
   let numberCss = "text-center m-0.5 text-2xl font-extrabold ";
-  if (props.content.isFlagged && props.content.isVisible === false)
+  if (props.content.isBomb && props.content.isVisible === true) body = "B";
+  else if (props.content.isFlagged && props.content.isVisible === false)
     body = (
       <svg
         xmlns="http://www.w3.org/2000/svg"

@@ -117,14 +117,14 @@ function App() {
             {"23:12"}
           </p>
           <div
-            onClick={() => {
+            onClick={async () => {
               reset();
             }}
             className="relative w-14 h-14 text-center bg-yellow-400 border-2 border-gray-800 
             items-center rounded-full hover:bg-yellow-300"
           >
-            <span className="absolute bottom-6 left-4 w-2 h-2 bg-gray-800 rounded-full"></span>
-            <span className="absolute bottom-6 right-4 w-2 h-2 bg-gray-800 rounded-full"></span>
+            <span className={`absolute bottom-6 left-4 w-2 h-2 bg-gray-800 rounded-full`}></span>
+            <span className={`absolute bottom-6 right-4 w-2 h-2 bg-gray-800 rounded-full`}></span>
             <span className="absolute top-4 right-[14px] w-6 h-6 border-b-4 border-gray-800 rounded-full"></span>
           </div>
 
