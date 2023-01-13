@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Block from "./components/block";
 import createTable from "./module/createTable";
 
@@ -13,8 +13,19 @@ function App() {
   const [show, setShow] = useState(false);
   const [mine, setMine] = useState(nMine);
   const [inClicks, setInClicks] = useState(true);
+  const [timer, setTimer] = useState(0);
+  const [over, setOver] = useState(false);
+
+  useEffect(() => {
+    let interval = setInterval(() => {
+      !over ? setTimer((old) => old + 1) : setTimer(timer);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [over, timer]);
 
   const reset = () => {
+    setOver(false);
+    setTimer(0);
     winnerMine = 0;
     setShow(false);
     setMine(nMine);
@@ -34,6 +45,7 @@ function App() {
   };
 
   const gameOver = useCallback(() => {
+    setOver(true);
     setAlert("HAI PERSO!");
     cssFinishGame = "bg-red-600 text-cyan-500";
     endGame();
@@ -113,8 +125,8 @@ function App() {
         border-b-gray-600 border-r-gray-600"
       >
         <div className="flex justify-between p-5 items-center">
-          <p className="text-4xl text-red-500 bg-gray-800 w-[33%] h-10 text-center">
-            {"23:12"}
+          <p className="text-4xl text-red-500 bg-gray-800 w-[33%] h-10 rounded-full text-center">
+            {timer}
           </p>
           <div
             onClick={async () => {
@@ -123,12 +135,16 @@ function App() {
             className="relative w-14 h-14 text-center bg-yellow-400 border-2 border-gray-800 
             items-center rounded-full hover:bg-yellow-300"
           >
-            <span className={`absolute bottom-6 left-4 w-2 h-2 bg-gray-800 rounded-full`}></span>
-            <span className={`absolute bottom-6 right-4 w-2 h-2 bg-gray-800 rounded-full`}></span>
+            <span
+              className={`absolute bottom-6 left-4 w-2 h-2 bg-gray-800 rounded-full`}
+            ></span>
+            <span
+              className={`absolute bottom-6 right-4 w-2 h-2 bg-gray-800 rounded-full`}
+            ></span>
             <span className="absolute top-4 right-[14px] w-6 h-6 border-b-4 border-gray-800 rounded-full"></span>
           </div>
 
-          <p className="text-4xl text-red-500 bg-gray-800 w-[33%] h-10 text-center">
+          <p className="text-4xl text-red-500 bg-gray-800 w-[33%] h-10 rounded-full text-center">
             {mine}
           </p>
         </div>
