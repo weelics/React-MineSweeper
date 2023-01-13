@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import Block from "./components/block";
 import createTable from "./module/createTable";
 
-const length = 9;
+const nCOL = 9;
+const length = 11;
 const nMine = 10;
 let winnerMine = 0;
 let cssFinishGame = "";
 
 function App() {
-  const [board, setBoard] = useState(createTable(length, nMine));
+  const [board, setBoard] = useState(createTable(nCOL, length, nMine));
   const [alert, setAlert] = useState("");
   const [show, setShow] = useState(false);
   const [mine, setMine] = useState(nMine);
@@ -29,7 +30,7 @@ function App() {
     winnerMine = 0;
     setShow(false);
     setMine(nMine);
-    setBoard(createTable(length, nMine));
+    setBoard(createTable(nCOL, length, nMine));
   };
 
   const setVisible = useCallback(
@@ -40,14 +41,14 @@ function App() {
   );
 
   const endGame = () => {
+    setOver(true);
     setMine(nMine);
     setShow(true);
   };
 
   const gameOver = useCallback(() => {
-    setOver(true);
     setAlert("HAI PERSO!");
-    cssFinishGame = "bg-red-600 text-cyan-500";
+    cssFinishGame = "bg-red-600 ";
     endGame();
   }, []);
 
@@ -59,7 +60,7 @@ function App() {
 
   const check = useCallback(
     (row, col) => {
-      if (row < 0 || row >= length || col < 0 || col >= length) return;
+      if (row < 0 || row >= length || col < 0 || col >= nCOL) return;
       if (board[row][col].isBomb) return;
       if (
         board[row][col].value === 0 &&
@@ -75,8 +76,10 @@ function App() {
         check(row, col + 1);
         check(row - 1, col + 1);
         check(row + 1, col - 1);
-      } else if (board[row][col].value !== 0 &&
-        board[row][col].isFlagged === false) {
+      } else if (
+        board[row][col].value !== 0 &&
+        board[row][col].isFlagged === false
+      ) {
         board[row][col].isVisible = true;
       }
     },
@@ -85,8 +88,8 @@ function App() {
 
   const checkBoard = useCallback(
     (key) => {
-      const row = Math.floor(key / length);
-      const col = key % length;
+      const row = Math.floor(key / nCOL);
+      const col = key % nCOL;
 
       if (!inClicks) {
         if (mine === 0 && !board[row][col].isFlagged) return;
@@ -121,29 +124,33 @@ function App() {
     <div className="mx-auto bg-[#C0C0C0] gap-4 md:max-w-min flex flex-col">
       <div
         className="bg-[#9f9f9f] p-2 border-t-4 border-l-4 
-        border-b-4 border-r-4
+        border-b-4 border-r-4 rounded-xl
         border-t-gray-300 border-l-gray-300
         border-b-gray-600 border-r-gray-600"
       >
-        <div className="flex justify-between p-5 items-center">
+        <div className="flex justify-between p-1 items-center">
           <p className="text-4xl text-red-500 bg-gray-800 w-[33%] h-10 rounded-full text-center">
             {timer}
           </p>
-          <div
-            onClick={async () => {
-              reset();
-            }}
-            className="relative w-14 h-14 text-center bg-yellow-400 border-2 border-gray-800 
-            items-center rounded-full hover:bg-yellow-300"
-          >
-            <span
-              className={`absolute bottom-6 left-4 w-2 h-2 bg-gray-800 rounded-full`}
-            ></span>
-            <span
-              className={`absolute bottom-6 right-4 w-2 h-2 bg-gray-800 rounded-full`}
-            ></span>
-            <span className="absolute top-4 right-[14px] w-6 h-6 border-b-4 border-gray-800 rounded-full"></span>
-          </div>
+          <span className="p-1 bg-yellow-400 hover:bg-red-500 rounded-full border-8 border-gray-900">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              stroke="currentColor"
+              className="w-16 h-16"
+              onClick={() => {
+                reset();
+              }}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
+          </span>
 
           <p className="text-4xl text-red-500 bg-gray-800 w-[33%] h-10 rounded-full text-center">
             {mine}
@@ -187,7 +194,7 @@ function App() {
       </div>
       <div
         className="bg-[#9f9f9f]  p-2 border-t-4 border-l-4 
-        border-b-4 border-r-4
+        border-b-4 border-r-4 rounded-xl
         border-t-gray-300 border-l-gray-300
         border-b-gray-600 border-r-gray-600"
       >
@@ -221,7 +228,7 @@ function App() {
             fill="red"
             className={`${
               inClicks ? "border-gray-500" : "border-green-600"
-            } w-20 h-20 border-8 rounded-full bg-gray-800 fill-red-600 hover:fill-amber-500`}
+            } w-20 h-20 p-2 border-8 rounded-full bg-gray-800 fill-red-600 hover:fill-amber-500`}
           >
             <path
               fillRule="evenodd"

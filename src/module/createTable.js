@@ -7,12 +7,9 @@ const shuffleArray = (array) => {
   }
 };
 
-export default function createTable(length, nMine) {
-  if (nMine >= length * length) nMine = length - 1;
-
-  const tmpA = new Array(length * length);
-
-  for (let i = 0; i < length * length; i++) {
+export default function createTable(COL, length, nMine) {
+  const tmpA = new Array(length * COL);
+  for (let i = 0; i < length * COL; i++) {
     tmpA[i] = {
       isVisible: false,
       value: 0,
@@ -26,14 +23,14 @@ export default function createTable(length, nMine) {
 
   for (let i = 0; i < length; i++) {
     a[i] = new Array(length);
-    for (let j = 0; j < length; j++) {
-      a[i][j] = tmpA[i * length + j];
-      a[i][j].key = i * length + j;
+    for (let j = 0; j < COL; j++) {
+      a[i][j] = tmpA[i * COL + j];
+      a[i][j].key = i * COL + j;
     }
   }
 
   for (let i = 0; i < length; i++) {
-    for (let j = 0; j < length; j++) {
+    for (let j = 0; j < COL; j++) {
       if (a[i][j].isBomb) {
         if (i > 0) {
           a[i - 1][j].value++;
@@ -46,7 +43,7 @@ export default function createTable(length, nMine) {
           a[i][j - 1].value++;
         }
 
-        if (j < length - 1) {
+        if (j < COL - 1) {
           a[i][j + 1].value++;
         }
 
@@ -54,11 +51,11 @@ export default function createTable(length, nMine) {
           a[i - 1][j - 1].value++;
         }
 
-        if (i < length - 1 && j < length - 1) {
+        if (i < length - 1 && j < COL - 1) {
           a[i + 1][j + 1].value++;
         }
 
-        if (i > 0 && j < length - 1) {
+        if (i > 0 && j < COL - 1) {
           a[i - 1][j + 1].value++;
         }
 
@@ -68,6 +65,5 @@ export default function createTable(length, nMine) {
       }
     }
   }
-
   return a;
 }

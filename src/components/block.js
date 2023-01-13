@@ -12,7 +12,7 @@ function Block(props) {
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
         fill="currentColor"
-        className="w-6 h-6 fill-red-600 ml-1 mt-1"
+        className="w-6 h-6 fill-red-600 ml-1 mt-2"
       >
         <path
           fillRule="evenodd"
