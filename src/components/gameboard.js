@@ -3,7 +3,7 @@ import Block from "./block";
 import createTable from "../module/createTable";
 
 const nCOL = 9;
-const length = 9;
+const length = 13;
 const nMine = 10;
 let cssFinishGame = "";
 
